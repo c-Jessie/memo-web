@@ -1,5 +1,5 @@
 # memo-web
-访问🔗 👉 (https://memo-web-seven.vercel.app/)
+访问 👉 [🔗](https://memo-web-seven.vercel.app/)
 
 ## Build
 
