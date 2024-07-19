@@ -1,7 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useSnapshot } from "valtio";
-import { valtioState } from "../state";
-import { generateRandomString } from '../utils';
+import { valtioState } from "@/state";
+import { generateRandomString } from '@/utils';
+import SvgIcon from "@/components/SvgIcon";
+// import sidebarLeftIcon from '@/assets/icons/sidebarleft.svg';
+// import 'vite-plugin-svg-icons/register'; // 必须在引入图标前引入
+
 function SideMenu() {
   const snapshot = useSnapshot(valtioState);
   const initCategory = snapshot.categories;
@@ -15,13 +19,15 @@ function SideMenu() {
 
   const [categoryLists, setCategoryLists] = useState(initCategory)
   const [isAdd, setIsAdd] = useState(false) // 存储当前是否是新增状态
-  const [isSearch, setIsSearch] = useState(false) // 存储当前是否是新增状态
+  const [isSearch, setIsSearch] = useState(false) // 存储当前是否是搜索状态
   const [newFolderName, setNewFolderName] = useState(''); // 存储当前新增文件夹名称
   const [searchValue, setSearchValue] = useState(''); // 搜索关键字
   const addInputRef = useRef(null); // 新增
   const searchInputRef = useRef(null); // 搜索
   // 新增
   const addCategory = () => {
+    valtioState.currentCategoryId = ''
+    valtioState.currentMemoId = ''
     setIsAdd(!isAdd);
     // 处理input没对焦问题 -- 方法2
     setTimeout(() => {
@@ -29,8 +35,8 @@ function SideMenu() {
     }, 0);
   };
   const onAddInputBlur = (e) => {
+    setIsAdd(false);
     if (!e.target.value) {
-      setIsAdd(false);
       setNewFolderName('')
     }
   };
@@ -50,6 +56,7 @@ function SideMenu() {
         setIsAdd(false);
         setNewFolderName('')
       } else {
+        setIsAdd(true);
         alert('不能重复命名哦～')
       }
     }
@@ -57,10 +64,17 @@ function SideMenu() {
   // 删除
   const removeCat = (e, items) => {
     e.stopPropagation()
-    const delItem = initCategory.filter(lists => lists.id !== items.id)
-    // setCategory(delItem)
-    valtioState.categories = delItem
-    valtioState.currentCategoryId = valtioState.categories[0].id
+    const delCat = initCategory.filter(lists => lists.id !== items.id)
+    const delMemo = initMemo.filter(lists => lists.categoryId !== items.id)
+    valtioState.categories = delCat
+    valtioState.memories = delMemo
+    setCategoryLists(delCat)
+    if (delCat.length > 0) {
+      valtioState.currentCategoryId = valtioState.categories[0].id
+    } else {
+      valtioState.currentCategoryId = ''
+      valtioState.currentMemoId = ''
+    }
   }
   // 搜索
   const onSearchKeyUp = (e) => {
@@ -101,7 +115,8 @@ function SideMenu() {
       if (!isRename) {
         finishEdit()
       } else {
-        setEditedFolderName(''); // 取消编辑并清空输入框
+        // setEditedFolderName(''); // 取消编辑并清空输入框
+        setIsAdd(true);
         alert('不能重复命名哦～')
       }
     } else if (e.key === "Escape") {
@@ -117,8 +132,8 @@ function SideMenu() {
         }
         return item;
       });
-      // setCategory(updatedCategory);
       valtioState.categories = updatedCategory
+      setCategoryLists(updatedCategory)
     }
 
     setIsEdit(false);
@@ -154,14 +169,15 @@ function SideMenu() {
             onKeyUp={onEditInputKeyUp}
           />
         ) : (
-          <div className='flex'>
-            <span className='pr-2'>{items.icon}</span>
+          <div className='flex items-center'>
+            {/* <span className='pr-2'>{items.icon}</span> */}
+            <SvgIcon name='folder' className='h-6 w-6 mr-2 text-orange-500' />
             <div className='truncate w-20'>{items.folderName}</div>
           </div>
         )}
       </div>
       <div className='flex'>
-        <div className='text-slate-400'>{
+        <div className='text-neutral-500'>{
           initMemo.filter(total => total.category === items.folderName).length
         }</div>
         {!(editIndex === index) && (
@@ -179,10 +195,10 @@ function SideMenu() {
   // }
   return (
     <>
-      <div className='flex-none overflow-auto px-4 w-64 h-screen my-5 border-r-[1px] border-l-black' >
+      <div className='bg-neutral-200 flex-none overflow-auto px-4 w-64 h-screen py-5 border-r-[1px] border-l-black' >
         {/* <button onClick={onSort}> 翻转 </button> */}
 
-        <div className=''>
+        {/* <div className=''>
           <span >{isSearch ? '👀' : '🔍'}</span>
           <input
             ref={searchInputRef}
@@ -195,24 +211,23 @@ function SideMenu() {
             onFocus={onSearchFocus}
             onKeyUp={onSearchKeyUp}
           />
+        </div> */}
+        <div className='flex items-center mb-6'>
+          <div className='w-4 h-4 mr-2 rounded-full bg-rose-500'></div>
+          <div className='w-4 h-4 mr-2 rounded-full bg-yellow-500'></div>
+          <div className='w-4 h-4 mr-20 rounded-full bg-green-500'></div>
+          <SvgIcon name='sidebarleft' className='h-7 w-7 text-slate-700' />
         </div>
-        <hr />
-        <div className='mt-4 h-4/5'>
-          {
-            categoryLists.length > 0 ?
-              folderItems :
-              <div className='px-4 py-4 text-slate-400'>无备忘录</div>
-          }
-        </div>
-        <hr />
-        <div className='flex text-slate-600 p-4' >
-          <span className='pr-2'>➕</span>
+
+        <div className='flex items-center text-slate-600 mb-6' >
+          {/* <span className='pr-2'>➕</span> */}
+          <SvgIcon name='pluscircle' className='h-5 w-5 mr-2' />
           {
             isAdd ?
               (
                 <input
                   ref={addInputRef}
-                  className="pl-2 mb-2.5 w-36"
+                  className="pl-2 w-40"
                   type="text"
                   placeholder="请输入文件名"
                   value={newFolderName}
@@ -221,7 +236,14 @@ function SideMenu() {
                   onKeyUp={onAddInputKeyUp}
                 />
               ) :
-              (<button className='mb-2.5' onClick={addCategory}>新建文件夹</button>)
+              (<button onClick={addCategory}>新建文件夹</button>)
+          }
+        </div>
+        <div className='h-full'>
+          {
+            categoryLists.length > 0 ?
+              folderItems :
+              <div className='px-4 py-4 text-slate-400'>无备忘录</div>
           }
         </div>
       </div >
