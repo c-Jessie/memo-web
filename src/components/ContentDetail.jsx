@@ -15,24 +15,23 @@ function ContentDetail() {
   const searchInputRef = useRef(null); // 搜索
   const [searchValue, setSearchValue] = useState(''); // 搜索关键字
   const [isSearch, setIsSearch] = useState(false) // 存储当前是否是搜索状态
+  const [contt, setContt] = useState('') // 存储当前是否是搜索状态
+  // 富文本
+  const quillRef = useRef(null);
   // 当前内容
   const currentMemoDetail = initContent.find(memo => memo.id === snapshot.currentMemoId) || {};
   // 当前文件夹
   const filterCategory = initCategory.filter(filterItem => filterItem.id === snapshot.currentCategoryId).map(obj => obj.folderName)[0]
-  // 富文本
-  const quillRef = useRef(null);
-  const Delta = Quill.import('delta');
-  // 编辑备忘录内容的方法
-  const editContent = (content) => {
-    if (quillRef.current) {
-      quillRef.current.setContents(content);
-    }
-  };
+  // 当前分类的备忘录条数
+  const catNum = initContent.filter(filterItem => filterItem.categoryId === snapshot.currentCategoryId)
   useEffect(() => {
     if (currentMemoDetail.contentDetail) {
-      editContent(currentMemoDetail.contentDetail);
+      quillRef.current.setContents(JSON.parse(currentMemoDetail.contentDetail).ops);
     }
   }, [currentMemoDetail.id]); // 依赖项包含 currentMemoDetail.id
+  useEffect(() => {
+    valtioState.currentMemoId = catNum.length > 0 ? catNum[0].id : null;
+  }, [valtioState.memories]);
   // 添加内容
   const addContent = () => {
     // 获取当前时间并转换为ISO 8601格式的字符串
@@ -59,8 +58,7 @@ function ContentDetail() {
 
   };
   // 编辑富文本
-  const handleTextChange = (newContent) => {
-    console.log('edit--', newContent);
+  const onTextChange = (newContent) => {
     const contentToUpdate = JSON.stringify(newContent);
     const updatedMemos = valtioState.memories.map((memo) => {
       if (memo.id === valtioState.currentMemoId) {
@@ -69,6 +67,14 @@ function ContentDetail() {
       return memo;
     });
     valtioState.memories = updatedMemos; // 更新状态
+  };
+  // 失焦 没有备忘录则删掉
+  const onEditorBlur = (quill) => {
+    const content = quill.getText().trim();
+    if (content === "") {
+      const updatedMemos = valtioState.memories.filter(memo => memo.id !== valtioState.currentMemoId);
+      valtioState.memories = updatedMemos;
+    }
   };
   // 搜索
   const onSearchKeyUp = (e) => {
@@ -92,7 +98,8 @@ function ContentDetail() {
       <Editor
         ref={quillRef}
         defaultValue={currentMemoDetail.contentDetail}
-        onTextChange={handleTextChange}
+        onTextChange={onTextChange}
+        onEditorBlur={onEditorBlur}
       />
     </div>
   )
