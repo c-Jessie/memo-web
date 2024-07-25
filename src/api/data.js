@@ -22,7 +22,7 @@ export const memories = [
   {
     id: generateRandomString(),
     title: "购物清单",
-    contentDetail: "牛奶, 面包, 鸡蛋, 苹果",
+    contentDetail: '{"ops":[{"insert":"面包"}]}',
     createdAt: 1720368000000,
     updatedAt: 1720368000000,
     reminders: [
@@ -35,8 +35,8 @@ export const memories = [
   },
   {
     id: generateRandomString(),
-    title: "购物清单22",
-    contentDetail: "牛奶222",
+    title: "购物清单2",
+    contentDetail: '{"ops":[{"insert":"牛奶"}]}',
     createdAt: 1720368000000,
     updatedAt: 1720368000000,
     reminders: [
@@ -49,10 +49,11 @@ export const memories = [
   },
   {
     id: generateRandomString(),
-    title: "工作会议",
-    contentDetail: "准备项目报告，讨论预算。",
+    title: "完成的优化任务",
+    contentDetail:
+      '{"ops":[{"insert":"优化"},{"attributes":{"header":1},"insert":"\\n"},{"insert":"UI还原&引入图标"},{"attributes":{"list":"ordered"},"insert":"\\n"},{"insert":"使用富文本编辑器的库"},{"attributes":{"list":"ordered"},"insert":"\\n"},{"insert":"转到国内浏览"},{"attributes":{"list":"ordered"},"insert":"\\n"}]}',
     createdAt: 1720454400000,
-    updatedAt: 1720454400000,
+    updatedAt: 1721766871428,
     reminders: [
       { id: "reminder-2", time: "2024-07-10T09:00:00Z", isCompleted: false },
     ],
@@ -64,7 +65,7 @@ export const memories = [
   {
     id: generateRandomString(),
     title: "新准备",
-    contentDetail: "",
+    contentDetail: '{"ops":[{"insert":"hello"}]}',
     createdAt: 1720368000000,
     updatedAt: 1720368000000,
     reminders: [

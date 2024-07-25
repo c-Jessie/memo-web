@@ -171,7 +171,7 @@ function SideMenu() {
         ) : (
           <div className='flex items-center'>
             {/* <span className='pr-2'>{items.icon}</span> */}
-            <SvgIcon name='folder' className='h-6 w-6 mr-2 text-orange-500' />
+            <SvgIcon name='folder' className='h-6 w-6 mr-2 text-amber-500' />
             <div className='truncate w-20'>{items.folderName}</div>
           </div>
         )}

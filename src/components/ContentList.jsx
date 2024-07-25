@@ -62,6 +62,17 @@ function ContentList() {
       valtioState.currentMemoId = ''
     }
   }
+  const deltaToPlainText = (delta) => {
+    let text = '';
+    const newO = JSON.parse(delta).ops
+    newO.forEach(op => {
+      if (op.insert) {
+        text += op.insert;
+      }
+    });
+    return text;
+  }
+
   // 内容列表
   const contentItems =
     filterContent.length === 0 ?
@@ -76,8 +87,8 @@ function ContentList() {
             <span className='mr-1'>{getTimeDisplay(items.updatedAt)}</span>
             {
               items.contentDetail ?
-                <div className='truncate text-neutral-500'>{items.contentDetail}</div> :
-                <div className=' text-neutral-500'>{'暂无内容'}</div>
+                <div className='truncate text-neutral-500'>{deltaToPlainText(items.contentDetail)}</div> :
+                <div className=' text-neutral-500'>暂无内容</div>
             }
           </div>
         </div>
