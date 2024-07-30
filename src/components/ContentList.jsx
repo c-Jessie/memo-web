@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import SvgIcon from "@/components/SvgIcon";
 import { useSnapshot } from "valtio";
 import { valtioState } from "@/state";
@@ -7,43 +7,15 @@ function ContentList() {
   // 添加 isLoading 状态
   const [isLoading, setIsLoading] = useState(false);
   const snapshot = useSnapshot(valtioState);
-  const initCategory = snapshot.categories;
+  const initSearch = snapshot.searchMemories
   const initContent = snapshot.memories
-  // 当前文件夹
-  const filterCategory = initCategory.filter(filterItem => filterItem.id === snapshot.currentCategoryId).map(obj => obj.folderName)[0]
+  const rename = useRef(null) //重命名
+  const [allMemo, setAllMemo] = useState(initContent)
+  const [renameVal, setRenameVal] = useState('')
+  const [isRename, setIsRename] = useState(false)
+  const [editId, setEditId] = useState(-1)
   // 当前备忘录
-  const filterContent = initContent.filter(filterItem => filterItem.category === filterCategory)
-  // const addContent = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     // 获取当前时间并转换为ISO 8601格式的字符串
-  //     const now = new Date();
-  //     // 如果你想要UTC时间戳
-  //     const timestamp = now.getTime();
-
-  //     // 这里是添加内容的逻辑
-  //     const newContent = {
-  //       id: generateRandomString(),
-  //       title: `新建备忘录 ${initContent.length + 1}`,
-  //       contentDetail: '',
-  //       createdAt: timestamp, // 使用当前时间作为创建时间
-  //       updatedAt: timestamp, // 同时更新更新时间
-  //       reminders: [],
-  //       isCompleted: false,
-  //       attachments: [],
-  //       category: filterCategory,
-  //       categoryId: snapshot.currentCategoryId
-  //     };
-  //     await simulateAsyncOperation();
-  //     // 更新备忘录列表
-  //     valtioState.memories = [newContent, ...initContent]
-  //     // 当前选中备忘录
-  //     valtioState.currentMemoId = newContent.id
-  //     setIsLoading(false);
-  //   } catch (error) {
-  //     setIsLoading(false); // 停止加载
-  //   }
-  // };
+  const filterContent = initContent.filter(filterItem => filterItem.categoryId === snapshot.currentCategoryId)
   const simulateAsyncOperation = () => {
     // 模拟异步操作
     return new Promise((res) => {
@@ -51,6 +23,33 @@ function ContentList() {
         res()
       }, 0)
     })
+  }
+  // 重命名
+  const setMemoName = (e, item) => {
+    setIsRename(!isRename)
+    setEditId(item.id)
+    setRenameVal(item.title)
+    setTimeout(() => {
+      rename.current.focus();
+    }, 0);
+  }
+  const onKeyUp = (e) => {
+    if (e.key === "Enter") {
+      const updatedMemo = valtioState.memories.map((item) => {
+        if (item.id === editId) {
+          return { ...item, title: renameVal }
+        }
+        return item
+      })
+      valtioState.memories = updatedMemo
+      // setRenameVal(e.target.value)
+      setIsRename(false);
+      setEditId(-1);
+
+    }
+  }
+  const onBlur = () => {
+    setIsRename(!isRename)
   }
   // 移除当前备忘录
   const removeMemo = async (e) => {
@@ -72,17 +71,52 @@ function ContentList() {
     });
     return text;
   }
+  useEffect(() => {
+    if (snapshot.searchValue) {
+      const searchLists = valtioState.memories.filter(item => item.title.includes(snapshot.searchValue) || item.contentDetail.includes(snapshot.searchValue))
+      valtioState.searchMemories = searchLists
+      valtioState.currentMemoId = searchLists.length > 0 ? searchLists[0].id : null
+      valtioState.currentCategoryId = searchLists.length > 0 ? searchLists[0].categoryId : null
+      setAllMemo(searchLists)
+    } else {
+      // valtioState.currentCategoryId = '0'
+      // valtioState.searchMemories = initContent
+      if (snapshot.currentCategoryId !== '0') {
+        setAllMemo(filterContent)
+        valtioState.searchMemories = filterContent
+      } else {
+        setAllMemo(initContent)
+        valtioState.searchMemories = initContent
+      }
+    }
+  }, [snapshot.searchValue, snapshot.currentCategoryId, snapshot.currentMemoId])
 
   // 内容列表
   const contentItems =
-    filterContent.length === 0 ?
+    allMemo.length === 0 ?
       <div className='py-3 px-4 text-center text-neutral-500 text-3xl'>{'无备忘录'}</div> :
-      filterContent.map((items, index) =>
+      allMemo.map((items, index) =>
         <div
           key={items.id}
           onClick={() => valtioState.currentMemoId = items.id}
           className={`my-2.5 py-3 px-4 cursor-default rounded-md  ${items.id === snapshot.currentMemoId && 'bg-amber-200'}`}>
-          <div className='truncate w-60 font-bold'>{items.title}</div>
+          <div onDoubleClick={(e) => setMemoName(e, items)}>
+            {
+              isRename && editId === items.id ?
+                <input
+                  ref={rename}
+                  className="pl-2 w-40"
+                  type="text"
+                  value={renameVal}
+                  onChange={(e) => setRenameVal(e.target.value)}
+                  onBlur={onBlur}
+                  onKeyUp={(e) => onKeyUp(e)}
+                /> :
+                <div className='truncate w-60 font-bold' >{items.title}</div>
+            }
+          </div>
+
+
           <div className='w-60 flex'>
             <span className='mr-1'>{getTimeDisplay(items.updatedAt)}</span>
             {

@@ -31,7 +31,7 @@ const Editor = forwardRef(({ defaultValue, onTextChange, onEditorBlur }, ref) =>
     if (defaultValueRef.current) {
       quill.setContents(JSON.parse(defaultValueRef.current).ops);
     }
-    quill.setSelection(quill.getLength());
+    // quill.setSelection(quill.getLength());
     // 监听 'text-change' 事件，当用户修改内容时更新 onTextChange 回调
     quill.on('text-change', (delta, oldDelta, source) => {
       if (source === Quill.sources.USER) {
@@ -39,15 +39,15 @@ const Editor = forwardRef(({ defaultValue, onTextChange, onEditorBlur }, ref) =>
       }
     });
     // 失焦
-    quill.on('selection-change', (range, oldRange, source) => {
-      if (range === null && source === 'user') {
-        onEditorBlur(quill);
-      }
-    });
+    // quill.on('selection-change', (range, oldRange, source) => {
+    //   if (range === null && source === 'user') {
+    //     onEditorBlur(quill);
+    //   }
+    // });
     // 组件卸载时的清理逻辑
     return () => {
       quill.off('text-change');
-      quill.off('selection-change');
+      // quill.off('selection-change');
       ref.current = null; // 清除 ref 的引用
       container.innerHTML = ""; // 清空容器内容
       quill.disable(); // 禁用 Quill 编辑器

@@ -1,37 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import SvgIcon from "@/components/SvgIcon";
+import Editor from './Editor';// 富文本
 import { useSnapshot } from "valtio";
 import { valtioState } from "@/state";
-import { generateRandomString } from '@/utils';
-// 富文本
-import Editor from './Editor';
-import Quill from 'quill'; // 导入 Quill.js 库
-import 'quill/dist/quill.snow.css';
+import { generateRandomString, debounce } from '@/utils';
 function ContentDetail() {
   // 添加 isLoading 状态
   const snapshot = useSnapshot(valtioState);
-  const initContent = snapshot.memories
   const initCategory = snapshot.categories;
+  const initContent = snapshot.memories
+  const [allMemo, setAllMemo] = useState(initContent);
   const searchInputRef = useRef(null); // 搜索
   const [searchValue, setSearchValue] = useState(''); // 搜索关键字
   const [isSearch, setIsSearch] = useState(false) // 存储当前是否是搜索状态
-  const [contt, setContt] = useState('') // 存储当前是否是搜索状态
   // 富文本
   const quillRef = useRef(null);
   // 当前内容
-  const currentMemoDetail = initContent.find(memo => memo.id === snapshot.currentMemoId) || {};
+  const currentMemoDetail = allMemo.find(memo => memo.id === snapshot.currentMemoId) || {};
   // 当前文件夹
   const filterCategory = initCategory.filter(filterItem => filterItem.id === snapshot.currentCategoryId).map(obj => obj.folderName)[0]
-  // 当前分类的备忘录条数
-  const catNum = initContent.filter(filterItem => filterItem.categoryId === snapshot.currentCategoryId)
-  useEffect(() => {
-    if (currentMemoDetail.contentDetail) {
-      quillRef.current.setContents(JSON.parse(currentMemoDetail.contentDetail).ops);
-    }
-  }, [currentMemoDetail.id]); // 依赖项包含 currentMemoDetail.id
-  useEffect(() => {
-    valtioState.currentMemoId = catNum.length > 0 ? catNum[0].id : null;
-  }, [valtioState.memories]);
   // 添加内容
   const addContent = () => {
     // 获取当前时间并转换为ISO 8601格式的字符串
@@ -68,24 +55,28 @@ function ContentDetail() {
     });
     valtioState.memories = updatedMemos; // 更新状态
   };
-  // 失焦 没有备忘录则删掉
+  // 失焦 没有备忘录内容则删掉
   const onEditorBlur = (quill) => {
     const content = quill.getText().trim();
     if (content === "") {
       const updatedMemos = valtioState.memories.filter(memo => memo.id !== valtioState.currentMemoId);
       valtioState.memories = updatedMemos;
+      const catNum = updatedMemos.filter(filterItem => filterItem.categoryId === snapshot.currentCategoryId)
+      valtioState.currentMemoId = catNum.length > 0 ? catNum[0].id : null;
     }
   };
   // 搜索
-  const onSearchKeyUp = (e) => {
-    if (e.key === "Enter" && e.target.value) {
-      // const ser = categoryLists.filter(item => item.folderName === searchValue)
-      // setCategoryLists(ser)
-      // selectCategory(ser[0])
-    } else {
-      // setCategoryLists(initCategory)
+  useEffect(() => {
+    setSearchValue(snapshot.searchValue)
+  }, [snapshot.searchValue])
+
+  const onSearchKeyUp = debounce((e) => {
+    e.preventDefault();
+    valtioState.searchValue = searchValue
+    if (searchValue) {
+      valtioState.currentCategoryId = '0'
     }
-  }
+  }, 0)
   const onSearchBlur = () => {
     setIsSearch(false);
   }
@@ -99,11 +90,10 @@ function ContentDetail() {
         ref={quillRef}
         defaultValue={currentMemoDetail.contentDetail}
         onTextChange={onTextChange}
-        onEditorBlur={onEditorBlur}
+      // onEditorBlur={onEditorBlur}
       />
     </div>
   )
-
 
   return (
     <>
@@ -149,8 +139,6 @@ function ContentDetail() {
             </div>
           </div>
         </div>
-
-        {/* <button className='text-2xl' onClick={removeMemo}>🗑️</button> */}
         <div className='p-4'>
           {snapshot.currentMemoId && memoDetail}
         </div>

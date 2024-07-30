@@ -1,10 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSnapshot } from "valtio";
 import { valtioState } from "@/state";
 import { generateRandomString } from '@/utils';
 import SvgIcon from "@/components/SvgIcon";
-// import sidebarLeftIcon from '@/assets/icons/sidebarleft.svg';
-// import 'vite-plugin-svg-icons/register'; // 必须在引入图标前引入
 
 function SideMenu() {
   const snapshot = useSnapshot(valtioState);
@@ -16,14 +14,10 @@ function SideMenu() {
   //     addInputRef.current.focus();
   //   }
   // }, [isAdd]);
-
   const [categoryLists, setCategoryLists] = useState(initCategory)
   const [isAdd, setIsAdd] = useState(false) // 存储当前是否是新增状态
-  const [isSearch, setIsSearch] = useState(false) // 存储当前是否是搜索状态
   const [newFolderName, setNewFolderName] = useState(''); // 存储当前新增文件夹名称
-  const [searchValue, setSearchValue] = useState(''); // 搜索关键字
   const addInputRef = useRef(null); // 新增
-  const searchInputRef = useRef(null); // 搜索
   // 新增
   const addCategory = () => {
     valtioState.currentCategoryId = ''
@@ -50,8 +44,18 @@ function SideMenu() {
           icon: '📁',
           total: 0
         };
-        setCategoryLists([newCategory, ...initCategory])
-        valtioState.categories = [newCategory, ...initCategory]
+        const insertAt = 1; // 可能是任何索引
+
+        const nextArtists = [
+          // 插入点之前的元素：
+          ...initCategory.slice(0, insertAt),
+          // 新的元素：
+          newCategory,
+          // 插入点之后的元素：
+          ...initCategory.slice(insertAt)
+        ];
+        setCategoryLists(nextArtists)
+        valtioState.categories = nextArtists
         valtioState.currentCategoryId = valtioState.categories[0].id
         setIsAdd(false);
         setNewFolderName('')
@@ -76,23 +80,6 @@ function SideMenu() {
       valtioState.currentMemoId = ''
     }
   }
-  // 搜索
-  const onSearchKeyUp = (e) => {
-    if (e.key === "Enter" && e.target.value) {
-      const ser = categoryLists.filter(item => item.folderName === searchValue)
-      setCategoryLists(ser)
-      selectCategory(ser[0])
-    } else {
-      setCategoryLists(initCategory)
-    }
-  }
-  const onSearchBlur = () => {
-    setIsSearch(false);
-  }
-  const onSearchFocus = () => {
-    setIsSearch(true);
-  }
-
   // 编辑
   const [isEdit, setIsEdit] = useState(false) // 存储当前是否是编辑状态
   const [editIndex, setEditIndex] = useState(-1); // 存储当前编辑项的索引
@@ -114,10 +101,6 @@ function SideMenu() {
       const isRename = initCategory.map(item => item.folderName === e.target.value).some(item => item === true);
       if (!isRename) {
         finishEdit()
-      } else {
-        // setEditedFolderName(''); // 取消编辑并清空输入框
-        setIsAdd(true);
-        alert('不能重复命名哦～')
       }
     } else if (e.key === "Escape") {
       setIsEdit(false);
@@ -139,18 +122,34 @@ function SideMenu() {
     setIsEdit(false);
     setEditIndex(-1); // 重置编辑索引
   };
+  const onBlur = () => {
+    setIsEdit(false);
+    setEditIndex(-1); // 重置编辑索引
+  }
   const selectCategory = (items) => {
     valtioState.currentCategoryId = items.id
-    const newMemo = initMemo.filter(
-      filterMemo => filterMemo.category === items.folderName
-    )
-    if (newMemo.length > 0) {
-      valtioState.currentMemoId = newMemo[0].id
+    valtioState.searchValue = ''
+    if (items.id !== '0') {
+      const newMemo = initMemo.filter(
+        filterMemo => filterMemo.categoryId === items.id
+      )
+      if (newMemo.length > 0) {
+        valtioState.currentMemoId = newMemo[0].id
+      } else {
+        valtioState.currentMemoId = null
+      }
     } else {
-      valtioState.currentMemoId = null
+      valtioState.currentMemoId = initMemo[0].id
     }
 
   }
+  useEffect(() => {
+    if (snapshot.currentCategoryId === '0' && initMemo.length > 0) {
+      valtioState.currentMemoId = initMemo[0].id
+    }
+  }, [snapshot.currentCategoryId])
+  // 全部数据
+
   // 文件夹列表
   const folderItems = categoryLists.map((items, index) =>
     <div
@@ -165,12 +164,11 @@ function SideMenu() {
             type="text"
             value={editedFolderName}
             onChange={(e) => setEditedFolderName(e.target.value)}
-            onBlur={finishEdit}
+            onBlur={onBlur}
             onKeyUp={onEditInputKeyUp}
           />
         ) : (
           <div className='flex items-center'>
-            {/* <span className='pr-2'>{items.icon}</span> */}
             <SvgIcon name='folder' className='h-6 w-6 mr-2 text-amber-500' />
             <div className='truncate w-20'>{items.folderName}</div>
           </div>
@@ -178,40 +176,22 @@ function SideMenu() {
       </div>
       <div className='flex'>
         <div className='text-neutral-500'>{
-          initMemo.filter(total => total.category === items.folderName).length
+          items.id === '0' ?
+            initMemo.length :
+            initMemo.filter(total => total.categoryId === items.id).length
         }</div>
-        {!(editIndex === index) && (
-          <button className="ml-3 text-neutral-400" onClick={(e) => startEdit(e, index)}>✏️</button>
-        )}
-        <button className={`ml-3 text-neutral-400 ${editIndex === index && 'hidden'}`} onClick={(e) => removeCat(e, items)}>🗑️</button>
+        <div className={` ${items.id === 0 && 'hidden'}`}>
+          {!(editIndex === index) && (
+            <button className="ml-3 text-neutral-400" onClick={(e) => startEdit(e, index)}>✏️</button>
+          )}
+          <button className={`ml-3 text-neutral-400 ${editIndex === index && 'hidden'}`} onClick={(e) => removeCat(e, items)}>🗑️</button>
+        </div>
       </div>
     </div >
   );
-  // 排序
-  // function onSort() {
-  //   const nextList = [...category];
-  //   nextList.reverse();
-  //   setCategory(nextList);
-  // }
   return (
     <>
       <div className='bg-neutral-200 flex-none overflow-auto px-4 w-64 h-screen py-5 border-r-[1px] border-l-black' >
-        {/* <button onClick={onSort}> 翻转 </button> */}
-
-        {/* <div className=''>
-          <span >{isSearch ? '👀' : '🔍'}</span>
-          <input
-            ref={searchInputRef}
-            className="pl-2 mb-2.5 w-36 outline-none"
-            type="text"
-            placeholder="搜索分类"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onBlur={onSearchBlur}
-            onFocus={onSearchFocus}
-            onKeyUp={onSearchKeyUp}
-          />
-        </div> */}
         <div className='flex items-center mb-6'>
           <div className='w-4 h-4 mr-2 rounded-full bg-rose-500'></div>
           <div className='w-4 h-4 mr-2 rounded-full bg-yellow-500'></div>
@@ -220,7 +200,6 @@ function SideMenu() {
         </div>
 
         <div className='flex items-center text-slate-600 mb-6' >
-          {/* <span className='pr-2'>➕</span> */}
           <SvgIcon name='pluscircle' className='h-5 w-5 mr-2' />
           {
             isAdd ?

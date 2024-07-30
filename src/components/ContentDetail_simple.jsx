@@ -11,9 +11,6 @@ function ContentDetail() {
   const snapshot = useSnapshot(valtioState);
   const initContent = snapshot.memories
   const initCategory = snapshot.categories;
-  const searchInputRef = useRef(null); // 搜索
-  const [searchValue, setSearchValue] = useState(''); // 搜索关键字
-  const [isSearch, setIsSearch] = useState(false) // 存储当前是否是搜索状态
   // 当前文件夹
   const filterCategory = initCategory.filter(filterItem => filterItem.id === snapshot.currentCategoryId).map(obj => obj.folderName)[0]
   const debounceTimeoutRef = useRef(null); // 使用 useRef 来保存定时器引用
@@ -100,22 +97,6 @@ function ContentDetail() {
   const italicText = () => {
     document.execCommand('italic', false);
   };
-  // 搜索
-  const onSearchKeyUp = (e) => {
-    if (e.key === "Enter" && e.target.value) {
-      // const ser = categoryLists.filter(item => item.folderName === searchValue)
-      // setCategoryLists(ser)
-      // selectCategory(ser[0])
-    } else {
-      // setCategoryLists(initCategory)
-    }
-  }
-  const onSearchBlur = () => {
-    setIsSearch(false);
-  }
-  const onSearchFocus = () => {
-    setIsSearch(true);
-  }
   const onBlurddd = () => {
     const selection = window.getSelection();
     const range = document.createRange();
@@ -183,15 +164,9 @@ function ContentDetail() {
                 <SvgIcon name='search' className={`h-4 w-4 text-slate-700 ${snapshot.currentCategoryId ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'}`} />
               </div>
               <input
-                ref={searchInputRef}
                 className="pl-2 w-64 outline-none"
                 type="text"
                 placeholder="搜索"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onBlur={onSearchBlur}
-                onFocus={onSearchFocus}
-                onKeyUp={onSearchKeyUp}
               />
             </div>
           </div>

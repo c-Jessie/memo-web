@@ -1,6 +1,7 @@
 // 文件夹
 import { generateRandomString } from "../utils";
 export const categories = [
+  { id: "0", folderName: "全部备忘录", icon: "😀" },
   {
     id: generateRandomString(),
     folderName: "工作",
@@ -31,7 +32,7 @@ export const memories = [
     isCompleted: false,
     attachments: ["/path/to/image1.jpg", "/path/to/document1.pdf"],
     category: "日常",
-    categoryId: categories[1].id,
+    categoryId: categories[2].id,
   },
   {
     id: generateRandomString(),
@@ -45,7 +46,7 @@ export const memories = [
     isCompleted: false,
     attachments: ["/path/to/image1.jpg", "/path/to/document1.pdf"],
     category: "日常",
-    categoryId: categories[1].id,
+    categoryId: categories[2].id,
   },
   {
     id: generateRandomString(),
@@ -60,7 +61,7 @@ export const memories = [
     isCompleted: false,
     attachments: ["/path/to/presentation.pptx"],
     category: "工作",
-    categoryId: categories[0].id,
+    categoryId: categories[1].id,
   },
   {
     id: generateRandomString(),
@@ -74,6 +75,6 @@ export const memories = [
     isCompleted: false,
     attachments: ["/path/to/presentation.pptx"],
     category: "工作",
-    categoryId: categories[0].id,
+    categoryId: categories[1].id,
   },
 ];
