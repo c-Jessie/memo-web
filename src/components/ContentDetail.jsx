@@ -3,7 +3,7 @@ import SvgIcon from "@/components/SvgIcon";
 import Editor from './Editor';// 富文本
 import { useSnapshot } from "valtio";
 import { valtioState } from "@/state";
-import { generateRandomString, debounce } from '@/utils';
+import { generateRandomString, debounce, getTimeDisplay } from '@/utils';
 import html2canvas from 'html2canvas';
 function ContentDetail() {
   // 添加 isLoading 状态
@@ -55,6 +55,7 @@ function ContentDetail() {
       return memo;
     });
     valtioState.memories = updatedMemos; // 更新状态
+    setAllMemo(updatedMemos)
   };
   // 失焦 没有备忘录内容则删掉
   const onEditorBlur = (quill) => {
@@ -81,7 +82,6 @@ function ContentDetail() {
   useEffect(() => {
     setSearchValue(snapshot.searchValue)
   }, [snapshot.searchValue])
-
   const onSearchKeyUp = debounce((e) => {
     e.preventDefault();
     valtioState.searchValue = searchValue
@@ -95,8 +95,15 @@ function ContentDetail() {
   const onSearchFocus = () => {
     setIsSearch(true);
   }
-  const memoDetail = (
+  useEffect(() => {
+    // 更新搜索的数组
+    valtioState.searchMemories = snapshot.memories
+  }, [snapshot.memories])
+
+  // 备忘录内容
+  const memoContent = (
     <div key={currentMemoDetail.id}>
+      {/* <div>{currentMemoDetail.contentDetail}</div> */}
       {/* 富文本编辑器👖 */}
       <Editor
         ref={quillRef}
@@ -151,8 +158,8 @@ function ContentDetail() {
             </div>
           </div>
         </div>
-        <div className='p-4'>
-          {snapshot.currentMemoId && memoDetail}
+        <div>
+          {snapshot.currentMemoId && memoContent}
         </div>
       </div >
     </>

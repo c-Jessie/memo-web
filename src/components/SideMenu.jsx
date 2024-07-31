@@ -129,19 +129,20 @@ function SideMenu() {
   const selectCategory = (items) => {
     valtioState.currentCategoryId = items.id
     valtioState.searchValue = ''
-    if (items.id !== '0') {
-      const newMemo = initMemo.filter(
-        filterMemo => filterMemo.categoryId === items.id
-      )
-      if (newMemo.length > 0) {
-        valtioState.currentMemoId = newMemo[0].id
+    const newMemo = initMemo.filter(
+      filterMemo => filterMemo.categoryId === items.id
+    )
+    if (newMemo.length > 0) {
+      if (items.id !== '0') {
+        if (newMemo.length > 0) {
+          valtioState.currentMemoId = newMemo[0].id
+        } else {
+          valtioState.currentMemoId = null
+        }
       } else {
-        valtioState.currentMemoId = null
+        valtioState.currentMemoId = initMemo[0].id
       }
-    } else {
-      valtioState.currentMemoId = initMemo[0].id
     }
-
   }
   useEffect(() => {
     if (snapshot.currentCategoryId === '0' && initMemo.length > 0) {
@@ -180,7 +181,7 @@ function SideMenu() {
             initMemo.length :
             initMemo.filter(total => total.categoryId === items.id).length
         }</div>
-        <div className={` ${items.id === 0 && 'hidden'}`}>
+        <div className={` ${items.id === '0' && 'hidden'}`}>
           {!(editIndex === index) && (
             <button className="ml-3 text-neutral-400" onClick={(e) => startEdit(e, index)}>✏️</button>
           )}

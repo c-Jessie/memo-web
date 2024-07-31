@@ -16,14 +16,6 @@ function ContentList() {
   const [editId, setEditId] = useState(-1)
   // 当前备忘录
   const filterContent = initContent.filter(filterItem => filterItem.categoryId === snapshot.currentCategoryId)
-  const simulateAsyncOperation = () => {
-    // 模拟异步操作
-    return new Promise((res) => {
-      setTimeout(() => {
-        res()
-      }, 0)
-    })
-  }
   // 重命名
   const setMemoName = (e, item) => {
     setIsRename(!isRename)
@@ -52,13 +44,28 @@ function ContentList() {
     setIsRename(!isRename)
   }
   // 移除当前备忘录
-  const removeMemo = async (e) => {
+  const removeMemo = (e) => {
     e.stopPropagation()
-    if (filterContent && filterContent.length > 0) {
-      const reItem = valtioState.memories.filter(item => item.id !== snapshot.currentMemoId)
-      await simulateAsyncOperation();
-      valtioState.memories = reItem
-      valtioState.currentMemoId = ''
+    // 查找当前备忘录 ID 在 allMemo 中的索引
+    const currentIndex = allMemo.findIndex(item => item.id === snapshot.currentMemoId);
+    const reItem = allMemo.filter(item => item.id !== snapshot.currentMemoId)
+    // 过滤掉要移除的备忘录项
+    valtioState.memories = valtioState.memories.filter(item => item.id !== snapshot.currentMemoId)
+    setAllMemo(reItem); // 更新状态
+    if (currentIndex !== -1) {
+      // 获取下一项的索引
+      const nextIndex = currentIndex + 1;
+      // 如果存在下一项，更新 currentMemoId
+      if (nextIndex < allMemo.length) {
+        valtioState.currentMemoId = allMemo[nextIndex].id;
+      } else {
+        // 如果没有下一项，可能需要将 currentMemoId 设置为前一项的 ID 或者清空
+        if (nextIndex > 0) {
+          valtioState.currentMemoId = allMemo[nextIndex - 2]?.id;
+        } else {
+          valtioState.currentMemoId = null;
+        }
+      }
     }
   }
   const deltaToPlainText = (delta) => {
@@ -99,7 +106,7 @@ function ContentList() {
         <div
           key={items.id}
           onClick={() => valtioState.currentMemoId = items.id}
-          className={`my-2.5 py-3 px-4 cursor-default rounded-md  ${items.id === snapshot.currentMemoId && 'bg-amber-200'}`}>
+          className={`py-3 px-4 cursor-default rounded-md ${items.id === snapshot.currentMemoId ? 'bg-amber-200 border-0' : 'border-b'}`}>
           <div onDoubleClick={(e) => setMemoName(e, items)}>
             {
               isRename && editId === items.id ?
@@ -115,8 +122,6 @@ function ContentList() {
                 <div className='truncate w-60 font-bold' >{items.title}</div>
             }
           </div>
-
-
           <div className='w-60 flex'>
             <span className='mr-1'>{getTimeDisplay(items.updatedAt)}</span>
             {
@@ -130,7 +135,7 @@ function ContentList() {
 
   return (
     <>
-      <div className='flex-none overflow-auto min-w-80 h-screen border-r-[1px] border-l-black'>
+      <div className='flex-none overflow-auto min-w-80 h-screen '>
         <div className='flex justify-between items-center p-4 bg-zinc-100 '>
           <div className='flex'>
             <div className=' p-1.5 mr-2 bg-zinc-200 rounded-md'>
