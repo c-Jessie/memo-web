@@ -20,8 +20,27 @@ const Editor = forwardRef(({ defaultValue, onTextChange, onEditorBlur }, ref) =>
     const container = containerRef.current; // 获取 DOM 容器
     // 创建一个新的 div 元素作为 Quill 编辑器的容器，并添加到 DOM 中
     const editorContainer = container.appendChild(container.ownerDocument.createElement("div"));
+    const toolbarOptions = [
+      ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+      ['blockquote', 'code-block'],
+      ['link', 'image', 'video', 'formula'],
+      [{ 'header': 1 }, { 'header': 2 }], // custom button values
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+      [{ 'script': 'sub' }, { 'script': 'super' }], // superscript/subscript
+      [{ 'indent': '-1' }, { 'indent': '+1' }], // outdent/indent
+      [{ 'direction': 'rtl' }], // text direction
+      [{ 'size': ['small', false, 'large', 'huge'] }], // custom dropdown
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }], // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['clean'] // remove formatting button
+    ];
     // 初始化 Quill 编辑器
     const quill = new Quill(editorContainer, {
+      modules: {
+        toolbar: toolbarOptions
+      },// 工具栏
       placeholder: '请输入...', // 编辑器的占位符文本
       theme: "snow", // 使用 'snow' 主题
     });
