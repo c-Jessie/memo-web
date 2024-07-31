@@ -4,6 +4,7 @@ import Editor from './Editor';// 富文本
 import { useSnapshot } from "valtio";
 import { valtioState } from "@/state";
 import { generateRandomString, debounce } from '@/utils';
+import html2canvas from 'html2canvas';
 function ContentDetail() {
   // 添加 isLoading 状态
   const snapshot = useSnapshot(valtioState);
@@ -65,6 +66,17 @@ function ContentDetail() {
       valtioState.currentMemoId = catNum.length > 0 ? catNum[0].id : null;
     }
   };
+  // 生成图片
+  const handleCapture = () => {
+    const element = document.querySelector('.ql-editor');
+    html2canvas(element).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = `${currentMemoDetail.title}.png`;
+      link.click();
+    });
+  };
   // 搜索
   useEffect(() => {
     setSearchValue(snapshot.searchValue)
@@ -102,7 +114,7 @@ function ContentDetail() {
           <div className={`p-1.5 text-slate-700 ${snapshot.currentCategoryId && currentMemoDetail.contentDetail !== '' ? 'cursor-pointer' : ' pointer-events-none cursor-not-allowed text-slate-300'}`} onClick={addContent}>
             <SvgIcon name='edit' className="h-6 w-6 " />
           </div>
-          <div className='flex'>
+          {/* <div className='flex'>
             <div className='p-1.5 mr-2 h-6 w-6 text-slate-700' >
               <SvgIcon name='textformat' className="h-6 w-6 " />
             </div>
@@ -115,15 +127,15 @@ function ContentDetail() {
             <div className='p-1.5  mr-2'>
               <SvgIcon name='photo' className="h-6 w-6 " />
             </div>
-          </div>
+          </div> */}
 
           <div className='flex'>
-            <div className='p-1.5  mr-2'>
-              <SvgIcon name='share' className={`h-6 w-6 text-slate-700 ${snapshot.currentCategoryId ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'}`} />
+            <div onClick={handleCapture} className={`p-1.5  mr-2  ${snapshot.currentMemoId && snapshot.currentCategoryId ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'}`} >
+              <SvgIcon name='share' className='h-6 w-6 text-slate-700' />
             </div>
             <div className={`flex items-center p-1.5 bg-white rounded-md ${isSearch && 'outline outline-3 outline-orange-200'}`}>
               <div className='px-1'>
-                <SvgIcon name='search' className={`h-4 w-4 text-slate-700 ${snapshot.currentCategoryId ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'}`} />
+                <SvgIcon name='search' className="h-4 w-4 text-slate-700 " />
               </div>
               <input
                 ref={searchInputRef}
