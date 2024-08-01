@@ -14,6 +14,7 @@ function ContentList() {
   const [renameVal, setRenameVal] = useState('')
   const [isRename, setIsRename] = useState(false)
   const [editId, setEditId] = useState(-1)
+  const [showMenu, setShowMenu] = useState(valtioState.showMenuStatue); // 菜单显示状态
   // 当前备忘录
   const filterContent = initContent.filter(filterItem => filterItem.categoryId === snapshot.currentCategoryId)
   // 重命名
@@ -106,7 +107,7 @@ function ContentList() {
         <div
           key={items.id}
           onClick={() => valtioState.currentMemoId = items.id}
-          className={`py-3 px-4 cursor-default rounded-md ${items.id === snapshot.currentMemoId ? 'bg-amber-200 border-0' : 'border-b'}`}>
+          className={`py-3 px-4 cursor-default ${items.id === snapshot.currentMemoId ? 'bg-amber-200  rounded-md border-0' : 'border-b'}`}>
           <div onDoubleClick={(e) => setMemoName(e, items)}>
             {
               isRename && editId === items.id ?
@@ -135,14 +136,17 @@ function ContentList() {
 
   return (
     <>
-      <div className='flex-none overflow-auto min-w-80 h-screen '>
+      <div className={`flex-none w-80 h-screen overflow-auto transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue ? 'translate-x-0' : '-translate-x-64'}`}>
         <div className='flex justify-between items-center p-4 bg-zinc-100 '>
-          <div className='flex'>
-            <div className=' p-1.5 mr-2 bg-zinc-200 rounded-md'>
-              <SvgIcon name='listbullet' className='h-5 w-5 text-slate-700 ' />
+          <div className='flex items-centers'>
+            <div className={`cursor-pointer mr-2 p-1.5 rounded-md hover:bg-zinc-200 transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = true}>
+              <SvgIcon name='sidebarleft' className='h-6 w-6 text-slate-700' />
             </div>
-            <div className=' p-1.5 rounded-md'>
-              <SvgIcon name='sgrid' className='h-5 w-5 text-slate-700' />
+            <div className='p-1.5 mr-2 rounded-md hover:bg-zinc-200'>
+              <SvgIcon name='listbullet' className='h-6 w-6 text-slate-700 ' />
+            </div>
+            <div className='p-1.5 mr-2 rounded-md hover:bg-zinc-200'>
+              <SvgIcon name='sgrid' className='h-6 w-6 text-slate-700' />
             </div>
           </div>
           {/* <button className='text-2xl' onClick={addContent}>✍️</button> */}

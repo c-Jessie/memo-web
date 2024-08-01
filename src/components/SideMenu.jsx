@@ -192,12 +192,14 @@ function SideMenu() {
   );
   return (
     <>
-      <div className='bg-neutral-200 flex-none overflow-auto px-4 w-64 h-screen py-5 border-r-[1px] border-l-black' >
-        <div className='flex items-center mb-6'>
+      <div className={`flex-none w-64 h-screen px-4 py-5  bg-neutral-200 overflow-auto border-r-[1px] border-l-black transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue ? 'translate-x-0' : '-translate-x-full'}`} >
+        <div className='flex items-center mb-6' >
           <div className='w-4 h-4 mr-2 rounded-full bg-rose-500'></div>
           <div className='w-4 h-4 mr-2 rounded-full bg-yellow-500'></div>
           <div className='w-4 h-4 mr-20 rounded-full bg-green-500'></div>
-          <SvgIcon name='sidebarleft' className='h-7 w-7 text-slate-700' />
+          <div className={`cursor-pointer ${!snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = false}>
+            <SvgIcon name='sidebarleft' className='h-6 w-6 text-slate-700' />
+          </div>
         </div>
 
         <div className='flex items-center text-slate-600 mb-6' >

@@ -8,6 +8,7 @@ const valtioState = proxy({
   currentCategoryId: "0",
   currentMemoId: null,
   searchValue: "",
+  showMenuStatue: true,
 });
 const storedData = localStorage.getItem("myValtioData");
 if (storedData) {

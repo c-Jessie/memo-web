@@ -116,7 +116,7 @@ function ContentDetail() {
 
   return (
     <>
-      <div className='overflow-auto grow'>
+      <div className={`flex-1 overflow-auto h-screen transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue ? 'translate-x-0' : '-translate-x-64'}`}>
         <div className='flex justify-between items-center bg-zinc-100 p-4'>
           <div className={`p-1.5 text-slate-700 ${snapshot.currentCategoryId && currentMemoDetail.contentDetail !== '' ? 'cursor-pointer' : ' pointer-events-none cursor-not-allowed text-slate-300'}`} onClick={addContent}>
             <SvgIcon name='edit' className="h-6 w-6 " />
