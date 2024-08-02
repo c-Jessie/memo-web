@@ -116,8 +116,12 @@ function ContentDetail() {
 
   return (
     <>
-      <div className={`flex-1 overflow-auto h-screen transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue ? 'translate-x-0' : '-translate-x-64'}`}>
-        <div className='flex justify-between items-center bg-zinc-100 p-4'>
+      <div className={`flex-1 overflow-y-auto scrollbar-thin`}>
+        {/* scrollbar-thin：设置一个细滚动条。
+        scrollbar-thumb-rounded：设置滚动条的滑块为圆角。
+        scrollbar-thumb-gray-300：设置滚动条滑块的颜色。
+        scrollbar-track-gray-100：设置滚动条轨道的颜色。 */}
+        <div className='flex justify-between items-center bg-zinc-100 p-4 sticky top-0 z-10'>
           <div className={`p-1.5 text-slate-700 ${snapshot.currentCategoryId && currentMemoDetail.contentDetail !== '' ? 'cursor-pointer' : ' pointer-events-none cursor-not-allowed text-slate-300'}`} onClick={addContent}>
             <SvgIcon name='edit' className="h-6 w-6 " />
           </div>

@@ -192,36 +192,39 @@ function SideMenu() {
   );
   return (
     <>
-      <div className={`flex-none w-64 h-screen px-4 py-5  bg-neutral-200 overflow-auto border-r-[1px] border-l-black transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue ? 'translate-x-0' : '-translate-x-full'}`} >
-        <div className='flex items-center mb-6' >
-          <div className='w-4 h-4 mr-2 rounded-full bg-rose-500'></div>
-          <div className='w-4 h-4 mr-2 rounded-full bg-yellow-500'></div>
-          <div className='w-4 h-4 mr-20 rounded-full bg-green-500'></div>
-          <div className={`cursor-pointer ${!snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = false}>
-            <SvgIcon name='sidebarleft' className='h-6 w-6 text-slate-700' />
+      <div className={`w-64 flex-none overflow-auto px-4 py-5 bg-neutral-200 border-r-[1px] border-l-black ${!snapshot.showMenuStatue && 'hidden'}`} >
+        <div className='bg-neutral-200 sticky top-0'>
+          <div className='flex items-center mb-6' >
+            <div className='w-4 h-4 mr-2 rounded-full bg-rose-500'></div>
+            <div className='w-4 h-4 mr-2 rounded-full bg-yellow-500'></div>
+            <div className='w-4 h-4 mr-20 rounded-full bg-green-500'></div>
+            <div className={`cursor-pointer ${!snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = false}>
+              <SvgIcon name='sidebarleft' className='h-6 w-6 text-slate-700' />
+            </div>
+          </div>
+
+          <div className='flex items-center text-slate-600 mb-6' >
+            <SvgIcon name='pluscircle' className='h-5 w-5 mr-2' />
+            {
+              isAdd ?
+                (
+                  <input
+                    ref={addInputRef}
+                    className="pl-2 w-40"
+                    type="text"
+                    placeholder="请输入文件名"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    onBlur={onAddInputBlur}
+                    onKeyUp={onAddInputKeyUp}
+                  />
+                ) :
+                (<button onClick={addCategory}>新建文件夹</button>)
+            }
           </div>
         </div>
 
-        <div className='flex items-center text-slate-600 mb-6' >
-          <SvgIcon name='pluscircle' className='h-5 w-5 mr-2' />
-          {
-            isAdd ?
-              (
-                <input
-                  ref={addInputRef}
-                  className="pl-2 w-40"
-                  type="text"
-                  placeholder="请输入文件名"
-                  value={newFolderName}
-                  onChange={(e) => setNewFolderName(e.target.value)}
-                  onBlur={onAddInputBlur}
-                  onKeyUp={onAddInputKeyUp}
-                />
-              ) :
-              (<button onClick={addCategory}>新建文件夹</button>)
-          }
-        </div>
-        <div className='h-full'>
+        <div className=''>
           {
             categoryLists.length > 0 ?
               folderItems :

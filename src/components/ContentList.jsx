@@ -136,10 +136,10 @@ function ContentList() {
 
   return (
     <>
-      <div className={`flex-none w-80 h-screen overflow-auto transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue ? 'translate-x-0' : '-translate-x-64'}`}>
-        <div className='flex justify-between items-center p-4 bg-zinc-100 '>
+      <div className={`w-80 flex-none overflow-auto`}>
+        <div className='flex justify-between items-center p-4 bg-zinc-100 sticky top-0'>
           <div className='flex items-centers'>
-            <div className={`cursor-pointer mr-2 p-1.5 rounded-md hover:bg-zinc-200 transition-transform duration-500 ease-in-out ${snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = true}>
+            <div className={`cursor-pointer mr-2 p-1.5 rounded-md hover:bg-zinc-200 ${snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = true}>
               <SvgIcon name='sidebarleft' className='h-6 w-6 text-slate-700' />
             </div>
             <div className='p-1.5 mr-2 rounded-md hover:bg-zinc-200'>
