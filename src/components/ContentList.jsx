@@ -136,7 +136,7 @@ function ContentList() {
 
   return (
     <>
-      <div className={`w-80 flex-none overflow-auto`}>
+      <div className={`w-80 flex-none overflow-hidden`}>
         <div className='flex justify-between items-center p-4 bg-zinc-100 sticky top-0'>
           <div className='flex items-centers'>
             <div className={`cursor-pointer mr-2 p-1.5 rounded-md hover:bg-zinc-200 ${snapshot.showMenuStatue && 'hidden'}`} onClick={() => valtioState.showMenuStatue = true}>
@@ -152,7 +152,7 @@ function ContentList() {
           {/* <button className='text-2xl' onClick={addContent}>✍️</button> */}
           <div className='p-1.5' onClick={removeMemo}><SvgIcon name='trash' className='h-6 w-6 text-slate-700 cursor-pointer' /></div>
         </div>
-        <div className='p-4'>
+        <div className='p-4 overflow-auto h-[60rem]'>
           {isLoading ? '加载中' : contentItems}
         </div>
       </div>

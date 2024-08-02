@@ -192,8 +192,8 @@ function SideMenu() {
   );
   return (
     <>
-      <div className={`w-64 flex-none overflow-auto px-4 py-5 bg-neutral-200 border-r-[1px] border-l-black ${!snapshot.showMenuStatue && 'hidden'}`} >
-        <div className='bg-neutral-200 sticky top-0'>
+      <div className={`w-72 flex-none overflow-hidden px-4 py-5 bg-neutral-200 border-r-[1px] border-l-black ${!snapshot.showMenuStatue && 'hidden'}`} >
+        <div className='bg-neutral-200 sticky top-0 '>
           <div className='flex items-center mb-6' >
             <div className='w-4 h-4 mr-2 rounded-full bg-rose-500'></div>
             <div className='w-4 h-4 mr-2 rounded-full bg-yellow-500'></div>
@@ -223,8 +223,7 @@ function SideMenu() {
             }
           </div>
         </div>
-
-        <div className=''>
+        <div className='overflow-auto h-[57rem]'>
           {
             categoryLists.length > 0 ?
               folderItems :

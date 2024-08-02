@@ -76,7 +76,7 @@ const Editor = forwardRef(({ defaultValue, onTextChange, onEditorBlur }, ref) =>
   }, [ref]); // 依赖项数组，当 ref 变化时重新运行 effect
 
   // 渲染一个包含引用的 div 元素
-  return <div ref={containerRef} className='h-screen'></div>;
+  return <div ref={containerRef} className='h-[55rem]'></div>;
 });
 
 // 设置组件的显示名称，便于调试

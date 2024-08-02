@@ -116,7 +116,7 @@ function ContentDetail() {
 
   return (
     <>
-      <div className={`flex-1 overflow-y-auto scrollbar-thin`}>
+      <div className={`flex-1 overflow-y-hidden scrollbar-thin`}>
         {/* scrollbar-thin：设置一个细滚动条。
         scrollbar-thumb-rounded：设置滚动条的滑块为圆角。
         scrollbar-thumb-gray-300：设置滚动条滑块的颜色。
@@ -162,7 +162,7 @@ function ContentDetail() {
             </div>
           </div>
         </div>
-        <div>
+        <div className='overflow-auto h-[61rem]'>
           {snapshot.currentMemoId && memoContent}
         </div>
       </div >
