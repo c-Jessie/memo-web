@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSnapshot } from "valtio";
 import { valtioState } from "@/state";
 import { generateRandomString } from '@/utils';
@@ -18,6 +18,23 @@ function SideMenu() {
   const [isAdd, setIsAdd] = useState(false) // 存储当前是否是新增状态
   const [newFolderName, setNewFolderName] = useState(''); // 存储当前新增文件夹名称
   const addInputRef = useRef(null); // 新增
+  const menuRef = useRef([]); // 悬浮菜单
+  const [hoveredIndex, setHoveredIndex] = useState(-1); //悬浮菜单
+  const [showMenuList, setShowMenuList] = useState(-1); //悬浮菜单
+  const [isHiddenMenu, setIsHiddenMenu] = useState(false); //悬浮菜单
+  const onMouseEnter = (index) => {
+    setHoveredIndex(index);
+  };
+  const onMouseLeave = () => {
+    // setHoveredIndex(-1);
+    // setShowMenuList(null)
+  };
+  const onShowMenu = (e, index) => {
+    e.stopPropagation()
+    setHoveredIndex(index)
+    setShowMenuList(index)
+    setIsHiddenMenu(false)
+  }
   // 新增
   const addCategory = () => {
     valtioState.currentCategoryId = ''
@@ -73,6 +90,7 @@ function SideMenu() {
     valtioState.categories = delCat
     valtioState.memories = delMemo
     setCategoryLists(delCat)
+    setShowMenuList(-1); // 隐藏菜单
     if (delCat.length > 0) {
       valtioState.currentCategoryId = valtioState.categories[0].id
     } else {
@@ -121,6 +139,7 @@ function SideMenu() {
 
     setIsEdit(false);
     setEditIndex(-1); // 重置编辑索引
+    setShowMenuList(-1); // 隐藏菜单
   };
   const onBlur = () => {
     setIsEdit(false);
@@ -144,19 +163,37 @@ function SideMenu() {
       }
     }
   }
+  // 隐藏菜单
+  const handleClickOutside = useCallback((event) => {
+    if (menuRef.current[showMenuList] && !menuRef.current[showMenuList].contains(event.target)) {
+      setShowMenuList(-1);
+    }
+  }, [showMenuList]);
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
   useEffect(() => {
     if (snapshot.currentCategoryId === '0' && initMemo.length > 0) {
       valtioState.currentMemoId = initMemo[0].id
     }
   }, [snapshot.currentCategoryId])
-  // 全部数据
 
   // 文件夹列表
   const folderItems = categoryLists.map((items, index) =>
     <div
       key={items.id}
-      className={`p-3 mb-2.5 rounded-md flex justify-between cursor-default  ${items.id === snapshot.currentCategoryId && 'bg-neutral-300'}`}
-      onClick={() => selectCategory(items)}>
+      className={`p-3 mb-2.5 border-2 rounded-md flex justify-between cursor-default
+        ${items.id === snapshot.currentCategoryId && 'bg-neutral-300'}
+        ${showMenuList === index && 'border-orange-400'}
+        `}
+      onClick={() => selectCategory(items)}
+      onMouseEnter={() => onMouseEnter(index)}
+      onMouseLeave={onMouseLeave}
+    >
       <div className=''>
         {isEdit && editIndex === index ? (
           <input
@@ -175,17 +212,28 @@ function SideMenu() {
           </div>
         )}
       </div>
-      <div className='flex'>
-        <div className='text-neutral-500'>{
-          items.id === '0' ?
-            initMemo.length :
-            initMemo.filter(total => total.categoryId === items.id).length
-        }</div>
-        <div className={` ${items.id === '0' && 'hidden'}`}>
-          {!(editIndex === index) && (
-            <button className="ml-3 text-neutral-400" onClick={(e) => startEdit(e, index)}>✏️</button>
-          )}
-          <button className={`ml-3 text-neutral-400 ${editIndex === index && 'hidden'}`} onClick={(e) => removeCat(e, items)}>🗑️</button>
+      {/* 悬浮菜单 */}
+      <div className='flex items-center'>
+        <div ref={el => (menuRef.current[index] = el)} className={`mx-2 ${isHiddenMenu ? 'hidden' : ''} `} >
+          <div className={`${hoveredIndex !== index && showMenuList !== index && 'hidden'}`} onClick={(e) => onShowMenu(e, index)}>
+            <SvgIcon name='more' className='h-4 w-4 text-gray-400' />
+          </div>
+          <div className={`absolute p-4 w-40 bg-neutral-100 rounded-lg shadow-md ${showMenuList !== index && 'hidden'}`} >
+            {items.folderName}
+            <div className={`p-2 border-b`} onClick={(e) => startEdit(e, index)}>编辑文件夹</div>
+            <div className={`p-2 border-b`} onClick={(e) => removeCat(e, items)}>删除文件夹</div>
+            <div className={`p-2 flex items-center justify-between `} >
+              <span>排序方式</span>
+              <SvgIcon name='chevronright' className='h-3 w-3' />
+            </div>
+          </div>
+        </div>
+        <div className='text-neutral-500'>
+          {
+            items.id === '0' ?
+              initMemo.length :
+              initMemo.filter(total => total.categoryId === items.id).length
+          }
         </div>
       </div>
     </div >
