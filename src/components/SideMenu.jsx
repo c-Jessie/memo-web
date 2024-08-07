@@ -219,7 +219,6 @@ function SideMenu() {
             <SvgIcon name='more' className='h-4 w-4 text-gray-400' />
           </div>
           <div className={`absolute p-4 w-40 bg-neutral-100 rounded-lg shadow-md ${showMenuList !== index && 'hidden'}`} >
-            {items.folderName}
             <div className={`p-2 border-b`} onClick={(e) => startEdit(e, index)}>编辑文件夹</div>
             <div className={`p-2 border-b`} onClick={(e) => removeCat(e, items)}>删除文件夹</div>
             <div className={`p-2 flex items-center justify-between `} >
