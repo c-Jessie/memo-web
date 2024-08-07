@@ -80,6 +80,9 @@ function ContentList() {
     return text;
   }
   useEffect(() => {
+    setAllMemo(initContent)
+  }, [snapshot.memories])
+  useEffect(() => {
     if (snapshot.searchValue) {
       const searchLists = valtioState.memories.filter(item => item.title.includes(snapshot.searchValue) || item.contentDetail.includes(snapshot.searchValue))
       valtioState.searchMemories = searchLists
