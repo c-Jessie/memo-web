@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react"; // 导入 React 的钩子
 import Quill from 'quill'; // 导入 Quill.js 库
 import 'quill/dist/quill.snow.css'; // 导入 Quill 的默认主题样式
+import '@/style/editor.css'; // 导入 Quill 的默认主题样式
 
 // 使用 forwardRef 创建一个引用的 React 组件
 const Editor = forwardRef(({ defaultValue, onTextChange, onEditorBlur }, ref) => {

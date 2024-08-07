@@ -155,7 +155,7 @@ function ContentList() {
           {/* <button className='text-2xl' onClick={addContent}>✍️</button> */}
           <div className='p-1.5' onClick={removeMemo}><SvgIcon name='trash' className='h-6 w-6 text-slate-700 cursor-pointer' /></div>
         </div>
-        <div className='p-4 overflow-auto h-[60rem]'>
+        <div className='p-4 border-r overflow-auto h-[60rem]'>
           {isLoading ? '加载中' : contentItems}
         </div>
       </div>

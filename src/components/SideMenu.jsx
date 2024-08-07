@@ -37,8 +37,8 @@ function SideMenu() {
   }
   // 新增
   const addCategory = () => {
-    valtioState.currentCategoryId = ''
-    valtioState.currentMemoId = ''
+    // valtioState.currentCategoryId = ''
+    // valtioState.currentMemoId = null
     setIsAdd(!isAdd);
     // 处理input没对焦问题 -- 方法2
     setTimeout(() => {
@@ -73,7 +73,8 @@ function SideMenu() {
         ];
         setCategoryLists(nextArtists)
         valtioState.categories = nextArtists
-        valtioState.currentCategoryId = valtioState.categories[0].id
+        valtioState.currentCategoryId = newCategory.id
+        valtioState.currentMemoId = null
         setIsAdd(false);
         setNewFolderName('')
       } else {
@@ -89,13 +90,17 @@ function SideMenu() {
     const delMemo = initMemo.filter(lists => lists.categoryId !== items.id)
     valtioState.categories = delCat
     valtioState.memories = delMemo
+    const currentIndex = initCategory.findIndex(item => item.id === snapshot.currentCategoryId);
     setCategoryLists(delCat)
     setShowMenuList(-1); // 隐藏菜单
-    if (delCat.length > 0) {
-      valtioState.currentCategoryId = valtioState.categories[0].id
+    if (delMemo.length > 0) {
+      const currentCategoryId = initCategory[currentIndex - 1].id
+      const isNullMemories = delMemo.findIndex(delItem => delItem.id === snapshot.currentMemoId)
+      valtioState.currentCategoryId = currentCategoryId
+      if (isNullMemories === -1) { valtioState.currentMemoId = null }
     } else {
-      valtioState.currentCategoryId = ''
-      valtioState.currentMemoId = ''
+      valtioState.currentCategoryId = '0'
+      valtioState.currentMemoId = null
     }
   }
   // 编辑
@@ -161,6 +166,8 @@ function SideMenu() {
       } else {
         valtioState.currentMemoId = initMemo[0].id
       }
+    } else {
+      valtioState.currentMemoId = null
     }
   }
   // 隐藏菜单
@@ -214,19 +221,22 @@ function SideMenu() {
       </div>
       {/* 悬浮菜单 */}
       <div className='flex items-center'>
-        <div ref={el => (menuRef.current[index] = el)} className={`mx-2 ${isHiddenMenu ? 'hidden' : ''} `} >
-          <div className={`${hoveredIndex !== index && showMenuList !== index && 'hidden'}`} onClick={(e) => onShowMenu(e, index)}>
-            <SvgIcon name='more' className='h-4 w-4 text-gray-400' />
-          </div>
-          <div className={`absolute p-4 w-40 bg-neutral-100 rounded-lg shadow-md ${showMenuList !== index && 'hidden'}`} >
-            <div className={`p-2 border-b`} onClick={(e) => startEdit(e, index)}>编辑文件夹</div>
-            <div className={`p-2 border-b`} onClick={(e) => removeCat(e, items)}>删除文件夹</div>
-            <div className={`p-2 flex items-center justify-between `} >
-              <span>排序方式</span>
-              <SvgIcon name='chevronright' className='h-3 w-3' />
+        {
+          items.id !== '0' &&
+          (<div ref={el => (menuRef.current[index] = el)} className={`mx-2 ${isHiddenMenu ? 'hidden' : ''} `} >
+            <div className={`${hoveredIndex !== index && showMenuList !== index && 'hidden'}`} onClick={(e) => onShowMenu(e, index)}>
+              <SvgIcon name='more' className='h-4 w-4 text-gray-400' />
             </div>
-          </div>
-        </div>
+            <div className={`absolute p-4 w-40 bg-neutral-100 rounded-lg shadow-md ${showMenuList !== index && 'hidden'}`} >
+              <div className={`p-2 border-b`} onClick={(e) => startEdit(e, index)}>编辑文件夹</div>
+              <div className={`p-2 border-b`} onClick={(e) => removeCat(e, items)}>删除文件夹</div>
+              <div className={`p-2 flex items-center justify-between `} >
+                <span>排序方式</span>
+                <SvgIcon name='chevronright' className='h-3 w-3' />
+              </div>
+            </div>
+          </div>)
+        }
         <div className='text-neutral-500'>
           {
             items.id === '0' ?
