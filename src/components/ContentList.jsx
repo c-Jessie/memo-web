@@ -80,7 +80,8 @@ function ContentList() {
     return text;
   }
   useEffect(() => {
-    setAllMemo(initContent)
+    const newList = snapshot.memories.filter(item => item.categoryId === valtioState.currentCategoryId)
+    setAllMemo(newList)
   }, [snapshot.memories])
   useEffect(() => {
     if (snapshot.searchValue) {

@@ -78,10 +78,11 @@ function ContentDetail() {
       link.click();
     });
   };
-  // 搜索
+  // 搜索 todo -- 优化：搜索应该是搜索全局的lists，搜索等于空值应该currentMemoId和currentCategoryId为搜索之前的值
   useEffect(() => {
     setSearchValue(snapshot.searchValue)
   }, [snapshot.searchValue])
+
   const onSearchKeyUp = debounce((e) => {
     e.preventDefault();
     valtioState.searchValue = searchValue
@@ -89,6 +90,7 @@ function ContentDetail() {
       valtioState.currentCategoryId = '0'
     }
   }, 0)
+
   const onSearchBlur = () => {
     setIsSearch(false);
   }
